@@ -8,3 +8,22 @@ export const useMutationSuccessEffect = (isSuccess, callback) => {
     }
   }, [isSuccess]);
 };
+
+export const useMutationEffect = ({
+  isSuccess,
+  isError,
+  onSuccess,
+  onError,
+}) => {
+  useEffect(() => {
+    if (isSuccess && onSuccess) {
+      onSuccess();
+    }
+  }, [isSuccess]);
+
+  useEffect(() => {
+    if (isError && onError) {
+      onError();
+    }
+  }, [isError]);
+};

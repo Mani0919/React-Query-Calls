@@ -1,7 +1,10 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Alert, Button, StyleSheet, Text, View } from "react-native";
 import { useCustomMutation } from "../../hooks/custommutation";
-import { useMutationSuccessEffect } from "../../hooks/helper";
+import {
+  useMutationEffect,
+  useMutationSuccessEffect,
+} from "../../hooks/helper";
 import {
   createDummyUser,
   deleteDummyUser,
@@ -10,7 +13,6 @@ import {
 const token =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4Mzk3MGE5MDRhODk1ZDkwOTFkMTdjNyIsImlhdCI6MTc1MjgyMTI5Nn0.ooxllzT7W2UaDQ-EJIzcdGZntn5DCwcCsRqUAV2axSY";
 export default function HomeScreen() {
-  const queryClient = useQueryClient();
   const { data: users = [], isLoading } = useQuery({
     queryKey: ["dummyUsers"],
     queryFn: fetchDummyUsers,
@@ -25,11 +27,22 @@ export default function HomeScreen() {
     "dummyUsers",
     "User Deleted"
   );
-  useMutationSuccessEffect(addUserMutation.isSuccess, () => {
-    Alert.alert("addedd");
-  });
+  // useMutationSuccessEffect(addUserMutation.isSuccess, () => {
+  //   Alert.alert("addedd");
+  // });
   useMutationSuccessEffect(deleteUserMutation.isSuccess, () => {
     Alert.alert("deleted");
+  });
+
+  useMutationEffect({
+    isSuccess: addUserMutation.isSuccess,
+    isError: addUserMutation.isError,
+    onSuccess: () => {
+      Alert.alert("Success", "User added successfully!");
+    },
+    onError: () => {
+      Alert.alert("Error", "Failed to add user!");
+    },
   });
   const handleAddUser = () => {
     const newUser = {
@@ -64,9 +77,17 @@ export default function HomeScreen() {
         ))
       )}
 
-      <Button title="Add New User" onPress={handleAddUser} />
+      <Button
+        title={addUserMutation.isLoading ? "Loading..." : "Add New User"}
+        onPress={handleAddUser}
+      />
       <View style={{ marginTop: 10 }}>
-        <Button title="Delete Last User" onPress={handleDeleteUser} />
+        <Button
+          title={
+            deleteUserMutation.isLoading ? "Loading..." : "Delete Last User"
+          }
+          onPress={handleDeleteUser}
+        />
       </View>
     </View>
   );
